@@ -1,0 +1,8 @@
+NOTES
+
+Area decreasing technique used in this lab:
+    * decrease condition expressitions
+    * decrease reg width as much as possible
+    * pack repeated condition expressition to wire
+    * reuse/share multiplyer, adder and mutiplexers
+    * remove unnecessary resets

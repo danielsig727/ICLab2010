@@ -12,8 +12,7 @@ module MCM(
     IN, 
     //Output Port
     OUT_VALID, 
-    OUT
-	/*,cnt_t, cnt_i, j, cnt_k, delay, q, midx, mcomp, macc, mini, minj, minacc, mincompmcomp, mincomp*/);
+    OUT);
 
 //---------------------------------------------------------------------
 //   PORT DECLARATION
@@ -23,13 +22,6 @@ input CLK, RESET, IN_VALID;
 input [7:0]  IN;
 output reg OUT_VALID;
 output reg [26:0]  OUT;
-/*
-output [3:0] cnt_t, cnt_i, j, cnt_k, delay, midx;
-output [26:0] q;*/
-//output [26:0] mcomp;
-/*output macc;
-output [3:0] mini, minj;*/
-//output [26:0] /*minacc, */mincomp;
 
 parameter IDLE = 0, READ = 1, CALC = 2, FIN = 3, OUTPUT = 4;
 parameter /*DEFLEN = 8, */STEPLENm1 = 4;
@@ -46,15 +38,7 @@ wire i_last = (cnt_i == 7 - cnt_t);
 wire k_last = (cnt_k == j - 1);
 reg [2:0] delay;
 wire ok = (delay == STEPLENm1);
-/*
-reg [26:0]	min01, min02, min03, min04, min05, min06, min07,
-			min12, min13, min14, min15, min16, min17,
-			min23, min24, min25, min26, min27,
-			min34, min35, min36, min37,
-			min45, min46, min47,
-			min56, min57,
-			min67;
-*/
+
 reg [23:0] 	min01, min12, min23, min34, min45, min56, min67;
 reg [24:0] 	min02, min13, min24, min35, min46, min57;
 reg [25:0] 	min03, min14, min25, min36, min47;
@@ -173,8 +157,6 @@ always @ (posedge CLK)
 ////////////////
 
 // Counters
-//reg [3:0] cnt_t, cnt_i, cnt_k;
-//wire [3:0] j = cnt_i + cnt_t;
 
 always @ (posedge CLK)
 	if(nstate == IDLE)
@@ -262,21 +244,6 @@ always @ (posedge CLK)
 ///////////////
 // Access min[i,j]
 ///////////////
-/*
-always @ *
-	if(delay == 1)
-		mini = cnt_k + 1;
-	else //if(delay == 0 || delay == 4)
-		mini = cnt_i;
-
-always @ *
-	if(nstate == OUTPUT)
-		minj = DEFLEN - 1;
-	else if(delay == 0)
-		minj = cnt_k;
-	else //if(delay == 1 || delay == 4)
-		minj = j;
-*/
 
 always @ * begin
 	mini = 0;
@@ -656,17 +623,13 @@ always @ (posedge CLK)
 ///////////////
 
 always @ (posedge CLK)
-	/*if(RESET)
-		OUT_VALID <= 0;
-	else */if(nstate == OUTPUT) 
+	if(nstate == OUTPUT) 
 		OUT_VALID <= 1;
 	else
 		OUT_VALID <= 0;
 
 always @ (posedge CLK)
-	/*if(RESET)
-		OUT <= 0;
-	else */if(nstate == OUTPUT)
+	if(nstate == OUTPUT)
 		OUT <= minacc;
 	else 
 		OUT <= 0;
