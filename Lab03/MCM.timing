@@ -1,0 +1,84 @@
+Information: Updating design information... (UID-85)
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+Design : MCM
+Version: B-2008.09-SP2
+Date   : Mon Jul 18 10:11:09 2011
+****************************************
+
+Operating Conditions: slow   Library: slow
+Wire Load Model Mode: top
+
+  Startpoint: cnt_i_reg[1]
+              (rising edge-triggered flip-flop clocked by CLK)
+  Endpoint: mincomp_reg[26]
+            (rising edge-triggered flip-flop clocked by CLK)
+  Path Group: CLK
+  Path Type: max
+
+  Point                                    Incr       Path
+  -----------------------------------------------------------
+  clock CLK (rise edge)                    0.00       0.00
+  clock network delay (ideal)              0.00       0.00
+  cnt_i_reg[1]/CK (DFFX1)                  0.00       0.00 r
+  cnt_i_reg[1]/Q (DFFX1)                   0.62       0.62 r
+  U2487/Y (XOR2X1)                         0.43       1.05 r
+  U2690/Y (XOR2X2)                         0.54       1.59 r
+  U2666/Y (NAND2X1)                        0.16       1.76 f
+  U2665/Y (NOR2X1)                         0.20       1.95 r
+  U2676/Y (AOI2BB2X1)                      0.23       2.18 f
+  U2708/Y (NOR2X1)                         0.32       2.50 r
+  U1288/Y (BUFX2)                          0.38       2.88 r
+  U2327/Y (AOI22XL)                        0.18       3.06 f
+  U2163/Y (NAND4XL)                        0.18       3.24 r
+  U2965/Y (NAND4BX1)                       0.25       3.49 r
+  U2080/Y (INVXL)                          0.09       3.58 f
+  U2964/Y (OAI2BB2X1)                      0.19       3.77 r
+  DP_OP_166_299_9792/U163/Y (NAND2X1)      0.15       3.92 f
+  DP_OP_166_299_9792/U154/Y (OAI21X1)      0.25       4.17 r
+  U2034/Y (AOI21X1)                        0.16       4.33 f
+  U1445/Y (OAI21X1)                        0.24       4.57 r
+  U1633/Y (AOI21X1)                        0.20       4.77 f
+  U2010/Y (OAI21X2)                        0.21       4.98 r
+  U2540/Y (AOI21X1)                        0.16       5.14 f
+  DP_OP_166_299_9792/U105/Y (OAI21X1)      0.24       5.38 r
+  U2541/Y (AOI21X1)                        0.17       5.55 f
+  U2542/Y (OAI21X1)                        0.24       5.80 r
+  U2543/Y (AOI21X1)                        0.17       5.97 f
+  U2544/Y (OAI21X1)                        0.29       6.26 r
+  U1447/Y (AOI21X2)                        0.19       6.45 f
+  U2558/Y (OAI21X4)                        0.17       6.62 r
+  U1465/Y (AOI21X2)                        0.16       6.77 f
+  U2557/Y (OAI21X4)                        0.16       6.94 r
+  U1446/Y (AOI21X2)                        0.12       7.05 f
+  DP_OP_166_299_9792/U35/Y (OAI21X1)       0.28       7.33 r
+  U2559/Y (AOI21X2)                        0.19       7.52 f
+  U2560/Y (OAI21X4)                        0.16       7.68 r
+  U2545/Y (AOI21X1)                        0.15       7.82 f
+  U2546/Y (OAI21X1)                        0.20       8.02 r
+  U2556/CO (ADDFX1)                        0.33       8.35 r
+  DP_OP_166_299_9792/U4/CO (ADDFX1)        0.32       8.67 r
+  DP_OP_166_299_9792/U3/CO (ADDFX1)        0.31       8.98 r
+  U1303/Y (XOR2X1)                         0.24       9.23 f
+  U1302/Y (AOI222X1)                       0.40       9.62 r
+  U1738/Y (INVX2)                          0.05       9.67 f
+  mincomp_reg[26]/D (DFFX1)                0.00       9.67 f
+  data arrival time                                   9.67
+
+  clock CLK (rise edge)                   10.00      10.00
+  clock network delay (ideal)              0.00      10.00
+  mincomp_reg[26]/CK (DFFX1)               0.00      10.00 r
+  library setup time                      -0.31       9.69
+  data required time                                  9.69
+  -----------------------------------------------------------
+  data required time                                  9.69
+  data arrival time                                  -9.67
+  -----------------------------------------------------------
+  slack (MET)                                         0.02
+
+
+1

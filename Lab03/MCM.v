@@ -12,8 +12,8 @@ module MCM(
     IN, 
     //Output Port
     OUT_VALID, 
-    OUT,
-	/*cnt_t, cnt_i, j, cnt_k, delay, q, midx, mcomp, macc, mini, minj, minacc, mincompmcomp, mincomp*/);
+    OUT
+	/*,cnt_t, cnt_i, j, cnt_k, delay, q, midx, mcomp, macc, mini, minj, minacc, mincompmcomp, mincomp*/);
 
 //---------------------------------------------------------------------
 //   PORT DECLARATION
@@ -32,7 +32,7 @@ output [3:0] mini, minj;*/
 //output [26:0] /*minacc, */mincomp;
 
 parameter IDLE = 0, READ = 1, CALC = 2, FIN = 3, OUTPUT = 4;
-parameter DEFLEN = 8, STEPLEN = 5;
+parameter /*DEFLEN = 8, */STEPLENm1 = 4;
 
 reg [2:0] state, nstate;
 reg [7:0] m0, m1, m2, m3, m4, m5, m6, m7, m8;
@@ -40,13 +40,13 @@ reg [7:0] macc;
 reg [26:0] mcomp;
 reg [3:0] midx;
 reg [3:0] inlen;
-reg [3:0] cnt_t, cnt_i, cnt_k;
-wire [3:0] j = cnt_i + cnt_t;
-wire i_last = (cnt_i == DEFLEN - cnt_t - 1);
+reg [2:0] cnt_t, cnt_i, cnt_k;
+wire [2:0] j = cnt_i + cnt_t;
+wire i_last = (cnt_i == 7 - cnt_t);
 wire k_last = (cnt_k == j - 1);
 reg [2:0] delay;
-wire ok = (delay == STEPLEN - 1);
-
+wire ok = (delay == STEPLENm1);
+/*
 reg [26:0]	min01, min02, min03, min04, min05, min06, min07,
 			min12, min13, min14, min15, min16, min17,
 			min23, min24, min25, min26, min27,
@@ -54,6 +54,14 @@ reg [26:0]	min01, min02, min03, min04, min05, min06, min07,
 			min45, min46, min47,
 			min56, min57,
 			min67;
+*/
+reg [23:0] 	min01, min12, min23, min34, min45, min56, min67;
+reg [24:0] 	min02, min13, min24, min35, min46, min57;
+reg [25:0] 	min03, min14, min25, min36, min47;
+reg [25:0] 	min04, min15, min26, min37;
+reg [26:0] 	min05, min16, min27;
+reg [26:0] 	min06, min17;
+reg [26:0] 	min07;
 
 reg [7:0] mini, minj;
 reg [26:0] minacc, mincomp;
@@ -80,7 +88,7 @@ always @ * begin
 		else
 			nstate = READ;
 	CALC:
-		if((cnt_t == DEFLEN - 1) && k_last && ok)
+		if((cnt_t == 7) && k_last && ok)
 			nstate = FIN;
 		else
 			nstate = CALC;
@@ -99,9 +107,7 @@ end
 
 
 always @ (posedge CLK)
-	if(RESET)
-		inlen <= 0;
-	else if(nstate == IDLE)
+	if(nstate == IDLE)
 		inlen <= 0;
 	else if(nstate == READ)
 		inlen <= inlen + 1;
@@ -109,73 +115,55 @@ always @ (posedge CLK)
 		inlen <= inlen;
 
 always @ (posedge CLK)
-	if(RESET)
-		m0 <= 0;
-	else if(nstate == READ && inlen == 0)
+	if(nstate == READ && inlen == 0)
 		m0 <= IN;
 	else
 		m0 <= m0;
 
 always @ (posedge CLK)
-	if(RESET)
-		m1 <= 0;
-	else if(nstate == READ && inlen == 1)
+	if(nstate == READ && inlen == 1)
 		m1 <= IN;
 	else
 		m1 <= m1;
 
 always @ (posedge CLK)
-	if(RESET)
-		m2 <= 0;
-	else if(nstate == READ && inlen == 2)
+	if(nstate == READ && inlen == 2)
 		m2 <= IN;
 	else
 		m2 <= m2;
 
 always @ (posedge CLK)
-	if(RESET)
-		m3 <= 0;
-	else if(nstate == READ && inlen == 3)
+	if(nstate == READ && inlen == 3)
 		m3 <= IN;
 	else
 		m3 <= m3;
 
 always @ (posedge CLK)
-	if(RESET)
-		m4 <= 0;
-	else if(nstate == READ && inlen == 4)
+	if(nstate == READ && inlen == 4)
 		m4 <= IN;
 	else
 		m4 <= m4;
 
 always @ (posedge CLK)
-	if(RESET)
-		m5 <= 0;
-	else if(nstate == READ && inlen == 5)
+	if(nstate == READ && inlen == 5)
 		m5 <= IN;
 	else
 		m5 <= m5;
 
 always @ (posedge CLK)
-	if(RESET)
-		m6 <= 0;
-	else if(nstate == READ && inlen == 6)
+	if(nstate == READ && inlen == 6)
 		m6 <= IN;
 	else
 		m6 <= m6;
 
 always @ (posedge CLK)
-	if(RESET)
-		m7 <= 0;
-	else if(nstate == READ && inlen == 7)
+	if(nstate == READ && inlen == 7)
 		m7 <= IN;
 	else
 		m7 <= m7;
 
 always @ (posedge CLK)
-	if(RESET)
-		m8 <= 0;
-	else if(nstate == READ && inlen == 8)
+	if(nstate == READ && inlen == 8)
 		m8 <= IN;
 	else
 		m8 <= m8;
@@ -189,9 +177,7 @@ always @ (posedge CLK)
 //wire [3:0] j = cnt_i + cnt_t;
 
 always @ (posedge CLK)
-	if(RESET)
-		cnt_t <= 1;
-	else if(nstate == IDLE)
+	if(nstate == IDLE)
 		cnt_t <= 1;
 	else if(nstate == CALC && i_last && k_last && ok)
 		cnt_t <= cnt_t + 1;
@@ -200,9 +186,7 @@ always @ (posedge CLK)
 
 
 always @ (posedge CLK)
-	if(RESET)
-		cnt_i <= 0;
-	else if(nstate == IDLE)
+	if(nstate == IDLE)
 		cnt_i <= 0;
 	else if(nstate == CALC && ok && k_last)
 		if(i_last)
@@ -213,9 +197,7 @@ always @ (posedge CLK)
 		cnt_i <= cnt_i;
 
 always @ (posedge CLK)
-	if(RESET)
-		cnt_k <= 0;
-	else if(nstate == IDLE)
+	if(nstate == IDLE)
 		cnt_k <= 0;
 	else if(nstate == CALC && ok)
 		if(k_last)
@@ -232,12 +214,10 @@ always @ (posedge CLK)
 // each step takes STEPLEN clock(s) to finish
 /////////
 always @ (posedge CLK)
-	if(RESET)
-		delay <= 0;
-	else if(nstate == IDLE)
+	if(nstate == IDLE)
 		delay <= 0;
 	else if(nstate == CALC)
-		if(delay == STEPLEN - 1)
+		if(delay == STEPLENm1)
 			delay <= 0;
 		else
 			delay <= delay + 1;
@@ -271,9 +251,7 @@ always @ *
 	endcase
 
 always @ (posedge CLK)
-	if(RESET)
-		mcomp <= 0;
-	else if(delay == 0)
+	if(delay == 0)
 		mcomp <= macc;
 	else if(delay == 1 || delay == 2)
 		mcomp <= mcomp * macc;
@@ -311,7 +289,7 @@ end
 always @ * begin
 	minj = 0;
 	if(nstate == OUTPUT)
-		minj[DEFLEN - 1] = 1;
+		minj[7] = 1;
 	else if(delay == 0)
 		minj[cnt_k] = 1;
 	else //if(delay == 1 || delay == 4)
@@ -441,9 +419,7 @@ always @ *
 		minacc = 0;
 
 always @ (posedge CLK)
-	if(RESET)
-		mincomp <= 0;
-	else if(delay == 0)
+	if(delay == 0)
 		mincomp <= minacc;
 	else if(delay == 1)
 		mincomp <= mincomp + minacc;
@@ -470,8 +446,11 @@ assign q = mincomp; // q is implemented in mincomp
 ///////////////
 // compare and each min
 ///////////////
-assign min_compare_and_assign = (state == CALC) && (delay == 4) && ((q < minacc) || (minacc == 0));
-assign q_smaller = (q < minacc) || (minacc == 0);
+
+reg [63:0] mininit;
+
+assign min_compare_and_assign = (state == CALC) && (delay == 4) && ((q < minacc) || (mininit[{cnt_i, j}] == 0));
+//assign q_smaller = 1;//(q < minacc) || (mininit[{cnt_i, j}] == 0);
 always @ * begin
 	pos_i = 0;
 	pos_i[cnt_i] = 1;
@@ -480,6 +459,15 @@ always @ * begin
 	pos_j = 0;
 	pos_j[j] = 1;
 end
+
+always @ (posedge CLK)
+	if(nstate == IDLE)
+		mininit <= 0;
+	else if(min_compare_and_assign)
+		mininit[{cnt_i, j}] <= 1;
+	else
+		mininit <= mininit;
+
 /*
 char str[1000] = "\
 always @ (posedge CLK)\n\
@@ -494,281 +482,169 @@ always @ (posedge CLK)\n\
 */
 
 always @ (posedge CLK)
-	if(RESET)
-		min01 <= 0;
-	else if(nstate == IDLE)
-		min01 <= 0;
-	else if(min_compare_and_assign && pos_i[0] && pos_j[1] && q_smaller)
+	if(min_compare_and_assign && pos_i[0] && pos_j[1])// && q_smaller)
 		min01 <= q;
 	else
 		min01 <= min01;
 
 always @ (posedge CLK)
-	if(RESET)
-		min02 <= 0;
-	else if(nstate == IDLE)
-		min02 <= 0;
-	else if(min_compare_and_assign && pos_i[0] && pos_j[2] && q_smaller)
+	if(min_compare_and_assign && pos_i[0] && pos_j[2])// && q_smaller)
 		min02 <= q;
 	else
 		min02 <= min02;
 
 always @ (posedge CLK)
-	if(RESET)
-		min03 <= 0;
-	else if(nstate == IDLE)
-		min03 <= 0;
-	else if(min_compare_and_assign && pos_i[0] && pos_j[3] && q_smaller)
+	if(min_compare_and_assign && pos_i[0] && pos_j[3])// && q_smaller)
 		min03 <= q;
 	else
 		min03 <= min03;
 
 always @ (posedge CLK)
-	if(RESET)
-		min04 <= 0;
-	else if(nstate == IDLE)
-		min04 <= 0;
-	else if(min_compare_and_assign && pos_i[0] && pos_j[4] && q_smaller)
+	if(min_compare_and_assign && pos_i[0] && pos_j[4])// && q_smaller)
 		min04 <= q;
 	else
 		min04 <= min04;
 
 always @ (posedge CLK)
-	if(RESET)
-		min05 <= 0;
-	else if(nstate == IDLE)
-		min05 <= 0;
-	else if(min_compare_and_assign && pos_i[0] && pos_j[5] && q_smaller)
+	if(min_compare_and_assign && pos_i[0] && pos_j[5])// && q_smaller)
 		min05 <= q;
 	else
 		min05 <= min05;
 
 always @ (posedge CLK)
-	if(RESET)
-		min06 <= 0;
-	else if(nstate == IDLE)
-		min06 <= 0;
-	else if(min_compare_and_assign && pos_i[0] && pos_j[6] && q_smaller)
+	if(min_compare_and_assign && pos_i[0] && pos_j[6])// && q_smaller)
 		min06 <= q;
 	else
 		min06 <= min06;
 
 always @ (posedge CLK)
-	if(RESET)
-		min07 <= 0;
-	else if(nstate == IDLE)
-		min07 <= 0;
-	else if(min_compare_and_assign && pos_i[0] && pos_j[7] && q_smaller)
+	if(min_compare_and_assign && pos_i[0] && pos_j[7])// && q_smaller)
 		min07 <= q;
 	else
 		min07 <= min07;
 
 always @ (posedge CLK)
-	if(RESET)
-		min12 <= 0;
-	else if(nstate == IDLE)
-		min12 <= 0;
-	else if(min_compare_and_assign && pos_i[1] && pos_j[2] && q_smaller)
+	if(min_compare_and_assign && pos_i[1] && pos_j[2])// && q_smaller)
 		min12 <= q;
 	else
 		min12 <= min12;
 
 always @ (posedge CLK)
-	if(RESET)
-		min13 <= 0;
-	else if(nstate == IDLE)
-		min13 <= 0;
-	else if(min_compare_and_assign && pos_i[1] && pos_j[3] && q_smaller)
+	if(min_compare_and_assign && pos_i[1] && pos_j[3])// && q_smaller)
 		min13 <= q;
 	else
 		min13 <= min13;
 
 always @ (posedge CLK)
-	if(RESET)
-		min14 <= 0;
-	else if(nstate == IDLE)
-		min14 <= 0;
-	else if(min_compare_and_assign && pos_i[1] && pos_j[4] && q_smaller)
+	if(min_compare_and_assign && pos_i[1] && pos_j[4])// && q_smaller)
 		min14 <= q;
 	else
 		min14 <= min14;
 
 always @ (posedge CLK)
-	if(RESET)
-		min15 <= 0;
-	else if(nstate == IDLE)
-		min15 <= 0;
-	else if(min_compare_and_assign && pos_i[1] && pos_j[5] && q_smaller)
+	if(min_compare_and_assign && pos_i[1] && pos_j[5])// && q_smaller)
 		min15 <= q;
 	else
 		min15 <= min15;
 
 always @ (posedge CLK)
-	if(RESET)
-		min16 <= 0;
-	else if(nstate == IDLE)
-		min16 <= 0;
-	else if(min_compare_and_assign && pos_i[1] && pos_j[6] && q_smaller)
+	if(min_compare_and_assign && pos_i[1] && pos_j[6])// && q_smaller)
 		min16 <= q;
 	else
 		min16 <= min16;
 
 always @ (posedge CLK)
-	if(RESET)
-		min17 <= 0;
-	else if(nstate == IDLE)
-		min17 <= 0;
-	else if(min_compare_and_assign && pos_i[1] && pos_j[7] && q_smaller)
+	if(min_compare_and_assign && pos_i[1] && pos_j[7])// && q_smaller)
 		min17 <= q;
 	else
 		min17 <= min17;
 
 always @ (posedge CLK)
-	if(RESET)
-		min23 <= 0;
-	else if(nstate == IDLE)
-		min23 <= 0;
-	else if(min_compare_and_assign && pos_i[2] && pos_j[3] && q_smaller)
+	if(min_compare_and_assign && pos_i[2] && pos_j[3])// && q_smaller)
 		min23 <= q;
 	else
 		min23 <= min23;
 
 always @ (posedge CLK)
-	if(RESET)
-		min24 <= 0;
-	else if(nstate == IDLE)
-		min24 <= 0;
-	else if(min_compare_and_assign && pos_i[2] && pos_j[4] && q_smaller)
+	if(min_compare_and_assign && pos_i[2] && pos_j[4])// && q_smaller)
 		min24 <= q;
 	else
 		min24 <= min24;
 
 always @ (posedge CLK)
-	if(RESET)
-		min25 <= 0;
-	else if(nstate == IDLE)
-		min25 <= 0;
-	else if(min_compare_and_assign && pos_i[2] && pos_j[5] && q_smaller)
+	if(min_compare_and_assign && pos_i[2] && pos_j[5])// && q_smaller)
 		min25 <= q;
 	else
 		min25 <= min25;
 
 always @ (posedge CLK)
-	if(RESET)
-		min26 <= 0;
-	else if(nstate == IDLE)
-		min26 <= 0;
-	else if(min_compare_and_assign && pos_i[2] && pos_j[6] && q_smaller)
+	if(min_compare_and_assign && pos_i[2] && pos_j[6])// && q_smaller)
 		min26 <= q;
 	else
 		min26 <= min26;
 
 always @ (posedge CLK)
-	if(RESET)
-		min27 <= 0;
-	else if(nstate == IDLE)
-		min27 <= 0;
-	else if(min_compare_and_assign && pos_i[2] && pos_j[7] && q_smaller)
+	if(min_compare_and_assign && pos_i[2] && pos_j[7])// && q_smaller)
 		min27 <= q;
 	else
 		min27 <= min27;
 
 always @ (posedge CLK)
-	if(RESET)
-		min34 <= 0;
-	else if(nstate == IDLE)
-		min34 <= 0;
-	else if(min_compare_and_assign && pos_i[3] && pos_j[4] && q_smaller)
+	if(min_compare_and_assign && pos_i[3] && pos_j[4])// && q_smaller)
 		min34 <= q;
 	else
 		min34 <= min34;
 
 always @ (posedge CLK)
-	if(RESET)
-		min35 <= 0;
-	else if(nstate == IDLE)
-		min35 <= 0;
-	else if(min_compare_and_assign && pos_i[3] && pos_j[5] && q_smaller)
+	if(min_compare_and_assign && pos_i[3] && pos_j[5])// && q_smaller)
 		min35 <= q;
 	else
 		min35 <= min35;
 
 always @ (posedge CLK)
-	if(RESET)
-		min36 <= 0;
-	else if(nstate == IDLE)
-		min36 <= 0;
-	else if(min_compare_and_assign && pos_i[3] && pos_j[6] && q_smaller)
+	if(min_compare_and_assign && pos_i[3] && pos_j[6])// && q_smaller)
 		min36 <= q;
 	else
 		min36 <= min36;
 
 always @ (posedge CLK)
-	if(RESET)
-		min37 <= 0;
-	else if(nstate == IDLE)
-		min37 <= 0;
-	else if(min_compare_and_assign && pos_i[3] && pos_j[7] && q_smaller)
+	if(min_compare_and_assign && pos_i[3] && pos_j[7])// && q_smaller)
 		min37 <= q;
 	else
 		min37 <= min37;
 
 always @ (posedge CLK)
-	if(RESET)
-		min45 <= 0;
-	else if(nstate == IDLE)
-		min45 <= 0;
-	else if(min_compare_and_assign && pos_i[4] && pos_j[5] && q_smaller)
+	if(min_compare_and_assign && pos_i[4] && pos_j[5])// && q_smaller)
 		min45 <= q;
 	else
 		min45 <= min45;
 
 always @ (posedge CLK)
-	if(RESET)
-		min46 <= 0;
-	else if(nstate == IDLE)
-		min46 <= 0;
-	else if(min_compare_and_assign && pos_i[4] && pos_j[6] && q_smaller)
+	if(min_compare_and_assign && pos_i[4] && pos_j[6])// && q_smaller)
 		min46 <= q;
 	else
 		min46 <= min46;
 
 always @ (posedge CLK)
-	if(RESET)
-		min47 <= 0;
-	else if(nstate == IDLE)
-		min47 <= 0;
-	else if(min_compare_and_assign && pos_i[4] && pos_j[7] && q_smaller)
+	if(min_compare_and_assign && pos_i[4] && pos_j[7])// && q_smaller)
 		min47 <= q;
 	else
 		min47 <= min47;
 
 always @ (posedge CLK)
-	if(RESET)
-		min56 <= 0;
-	else if(nstate == IDLE)
-		min56 <= 0;
-	else if(min_compare_and_assign && pos_i[5] && pos_j[6] && q_smaller)
+	if(min_compare_and_assign && pos_i[5] && pos_j[6])// && q_smaller)
 		min56 <= q;
 	else
 		min56 <= min56;
 
 always @ (posedge CLK)
-	if(RESET)
-		min57 <= 0;
-	else if(nstate == IDLE)
-		min57 <= 0;
-	else if(min_compare_and_assign && pos_i[5] && pos_j[7] && q_smaller)
+	if(min_compare_and_assign && pos_i[5] && pos_j[7])// && q_smaller)
 		min57 <= q;
 	else
 		min57 <= min57;
 
 always @ (posedge CLK)
-	if(RESET)
-		min67 <= 0;
-	else if(nstate == IDLE)
-		min67 <= 0;
-	else if(min_compare_and_assign && pos_i[6] && pos_j[7] && q_smaller)
+	if(min_compare_and_assign && pos_i[6] && pos_j[7])// && q_smaller)
 		min67 <= q;
 	else
 		min67 <= min67;
@@ -780,17 +656,17 @@ always @ (posedge CLK)
 ///////////////
 
 always @ (posedge CLK)
-	if(RESET)
+	/*if(RESET)
 		OUT_VALID <= 0;
-	else if(nstate == OUTPUT) 
+	else */if(nstate == OUTPUT) 
 		OUT_VALID <= 1;
 	else
 		OUT_VALID <= 0;
 
 always @ (posedge CLK)
-	if(RESET)
+	/*if(RESET)
 		OUT <= 0;
-	else if(nstate == OUTPUT)
+	else */if(nstate == OUTPUT)
 		OUT <= minacc;
 	else 
 		OUT <= 0;

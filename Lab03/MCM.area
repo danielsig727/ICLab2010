@@ -1,0 +1,24 @@
+ 
+****************************************
+Report : area
+Design : MCM
+Version: B-2008.09-SP2
+Date   : Mon Jul 18 10:11:09 2011
+****************************************
+
+Library(s) Used:
+
+    slow (File: /RAID2/COURSE/Icsum/Icsumt07/Lib/umc018/Synthesis/slow.db)
+
+Number of ports:               39
+Number of nets:              3258
+Number of cells:             3091
+Number of references:          74
+
+Combinational area:       40039.877679
+Noncombinational area:    65569.998249
+Net Interconnect area:      undefined  (No wire load specified)
+
+Total cell area:          105609.875928
+Total area:                 undefined
+1
